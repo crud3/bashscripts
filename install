@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# Log level (0 standard, 1 verbose)
+log_level=0
+
+# Overwrite existing symlinks that point to a different file
+force_overwrite=false
+
+# directory in which the symlinks are going to be created
+bin_dir=$HOME/bin
+
+# directory in which the actual scripts are
+scripts_dir=$HOME/bashscripts/scripts
+
+# scripts that are to be installed
+script_list=(signal-messenger bashscript_template doesNotExistJustForTesting)
+
+usage() {
+  echo "This script makes the specified bash scripts in ./scripts executable"
+  echo "and creates symlinks to them in the ~/bin/ directory"
+  echo "This script cannot be executed with more than one parameter"
+  echo "Usage: $0 [-h] [-f] [-v]"
+  echo "  -h      Display this message"
+  echo "  -f      Force overwriting of symlinks that exist and point to a different file."
+  echo "          This automatically activates verbose mode!"
+  echo "  -v      Activate verbose mode" 
+}
+
+log_error() {
+  echo -e "Error: $@" >&2
+}
+
+log_warning() {
+  echo -e "Warning: $@"
+}
+
+log() {
+  if [[ $log_level -eq 1 ]]; then
+    echo -e "$@"
+  fi
+}
+
+# Checks if the ~/bin dir exists and is in $PATH
+check_bin_dir()
+{
+  if [ -d $bin_dir ]; then
+    log "$bin_dir exsists"
+    if [[ :$PATH: == *:"$bin_dir":* ]]; then
+      log "$bin_dir is in \$PATH"
+    else
+      log_warning "$bin_dir is not in \$PATH! You have to add it to your PATH manually!\n"
+    fi
+  else
+    log_error "Directory $bin_dir doesn't exist! Exiting ..."
+    exit 1
+  fi							    
+}
+
+
+write_symlink() {
+  log "Trying to write symlink to $(readlink -f $scripts_dir/$1) at $bin_dir"
+  # Check if symlink already exists
+  if [[ -L $bin_dir/$1 ]]; then
+    # Check if symlink points to the file it should point to
+    if [[ "$(readlink $bin_dir/$1)" == "$(readlink -f $scripts_dir/$1)" ]]; then
+      log "Symlink already exists and points to the correct file, skipping!"
+    else
+      if $force_overwrite ; then
+        log "Symlink already exists and points to a different file, OVERWRITING"
+        ln -s -f $(readlink -f $scripts_dir/$1) $bin_dir/$1
+      else
+        log_warning "Symlink $bin_dir/$1 already exists, but points to a different file!"
+        log_warning "Please rerun with -f option to force overwrite\n"
+      fi
+    fi
+  else
+    # Symlink does not exist, write it
+    log "Did not find symlink at target, creating one now!"
+    ln -s $(readlink -f $scripts_dir/$1) $bin_dir
+  fi
+}
+
+
+main() {
+  echo -n "Installing: "
+  for script in ${script_list[@]}; do echo -n "$script "; done
+  echo -e "\nScript directory: $scripts_dir"
+  echo -e "Bin directory: $bin_dir\n"
+
+  check_bin_dir
+
+  for script in ${script_list[@]}
+  do
+    log "\nProcessing script $script"
+    # Check if script exists in the scripts/ dir
+    if [[ -f $scripts_dir/$script ]]; then
+      log "Found script $script in $scripts_dir, making it executable!"
+      chmod +x $scripts_dir/$script
+      write_symlink $script
+
+    else
+      log_warning "Script $script does not exist!\n"
+    fi
+  done
+  echo "Done!"
+  exit 0
+}
+
+# Parsing arguments
+if [ $# -eq 1 ]; then
+  if [ "$1" == "-h" ]; then
+    usage
+    exit 0
+  elif [ "$1" == "-f" ]; then
+    log_level=1
+    log "Entering force mode! Log level set to verbose!\n"
+    force_overwrite=true
+  elif [ "$1" == "-v" ]; then
+    log_level=1
+    log "Log level set to verbose!\n"
+  else
+    log_error "Illegal Argument!"
+    usage
+    exit 1
+  fi
+elif [ $# -ge 2 ]; then
+  log_error "Only one argument permitted!" 
+  usage
+  exit 1
+fi
+
+# Go to main method
+main
