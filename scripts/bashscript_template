@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# bash script template with simple control structures and argument parsing
+
+usage()  
+{  
+  echo "Usage: $0 [-f] [-h]"
+  echo "  -f      Do whatever f"
+  echo "  -h      Display this message"  
+}
+
+if [ $# -eq 0 ]; then
+	echo "0 Parameters"
+elif [ $# -eq 1 ]; then
+  if [ "$1" == "-f" ]; then
+	echo "1 correct Parameter"
+  elif [ "$1" == "-h" ]; then
+    usage
+    exit 0
+  else
+    echo "Illegal Argument!" >&2
+    usage
+    exit 1
+  fi
+else
+  echo "Illegal Arguments!" >&2
+  usage
+  exit 1
+fi
+
