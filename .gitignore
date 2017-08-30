@@ -1,2 +1,5 @@
 # Testing ground for scripts under active development
 testarea/
+
+# Vim swap file
+*.swp
