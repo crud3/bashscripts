@@ -1,0 +1,37 @@
+#!/bin/bash
+
+usage()  
+{  
+  echo "Starts the Chrome extension 'Signal Private Messenger' and detaches with nohup"
+  echo "No 'nohup.out' file will be created!"
+  echo "Usage: $0 [-f] [-h]"
+  echo "  -f      run without detaching and supressing output"
+  echo "  -h      Display this message"  
+}
+
+# ID of Signal Private Messenger extension (see Chrome webstore)
+signal_ext_id=bikioccmkafdpakkkcpdbppfkghcmihk
+start_signal_command="chromium-browser --app-id=$signal_ext_id"
+
+if [ $# -eq 0 ]; then
+  # start with nohup and pipe stdout and stderr to /dev/null
+  nohup $start_signal_command >/dev/null 2>&1
+  exit 0
+elif [ $# -eq 1 ]; then
+  if [ "$1" == "-f" ]; then
+    $start_signal_command
+    exit 0
+  elif [ "$1" == "-h" ]; then
+    usage
+    exit 0
+  else
+    echo "Illegal Argument!" >&2
+    usage
+    exit 1
+  fi
+else
+  echo "Illegal Arguments!" >&2
+  usage
+  exit 1
+fi
+
