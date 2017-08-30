@@ -18,7 +18,7 @@ script_list=(signal-messenger bashscript_template doesNotExistJustForTesting)
 usage() {
   echo "This script makes the specified bash scripts in ./scripts executable"
   echo "and creates symlinks to them in the ~/bin/ directory"
-  echo "This script cannot be executed with more than one parameter"
+  echo "This script cannot be executed with more than one option!"
   echo "Usage: $0 [-h] [-f] [-v]"
   echo "  -h      Display this message"
   echo "  -f      Force overwriting of symlinks that exist and point to a different file."
@@ -119,12 +119,12 @@ if [ $# -eq 1 ]; then
     log_level=1
     log "Log level set to verbose!\n"
   else
-    log_error "Illegal Argument!"
+    log_error "Illegal Argument!\n"
     usage
     exit 1
   fi
 elif [ $# -ge 2 ]; then
-  log_error "Only one argument permitted!" 
+  log_error "Only one option permitted!\n" 
   usage
   exit 1
 fi
