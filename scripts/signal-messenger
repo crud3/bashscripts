@@ -2,8 +2,9 @@
 
 usage()  
 {  
-  echo "Starts the Chrome extension 'Signal Private Messenger' and detaches with nohup"
+  echo "This script starts the Chrome extension 'Signal Private Messenger' and detaches with nohup"
   echo "No 'nohup.out' file will be created!"
+  echo "This script cannot be executed with more than one option!"
   echo "Usage: $0 [-f] [-h]"
   echo "  -f      run without detaching and supressing output"
   echo "  -h      Display this message"  
@@ -25,12 +26,13 @@ elif [ $# -eq 1 ]; then
     usage
     exit 0
   else
-    echo "Illegal Argument!" >&2
+    echo -e "Error: Illegal Argument!\n" >&2
     usage
     exit 1
   fi
-else
-  echo "Illegal Arguments!" >&2
+
+elif [ $# -ge 2 ]; then
+  echo -e "Error: Only one option permitted!\n"
   usage
   exit 1
 fi
