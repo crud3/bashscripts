@@ -1,30 +1,53 @@
 #!/bin/bash
 
-# bash script template with simple control structures and argument parsing
+# bash script template with control structures, argument parsing and logging
 
-usage()  
-{  
-  echo "Usage: $0 [-f] [-h]"
-  echo "  -f      Do whatever f"
-  echo "  -h      Display this message"  
+# Log level (0 standard, 1 verbose)
+log_level=0
+
+usage() {
+  echo "I am doing absolutely nothing"
+  echo "Usage: $0 [-h] [-v]"
+  echo "  -h      Display this message"
+  echo "  -v      Be verbose" 
 }
 
-if [ $# -eq 0 ]; then
-	echo "0 Parameters"
-elif [ $# -eq 1 ]; then
-  if [ "$1" == "-f" ]; then
-	echo "1 correct Parameter"
-  elif [ "$1" == "-h" ]; then
+log_error() {
+  echo "$@" >&2
+}
+
+log() {
+  if [[ $log_level -eq 1 ]]; then
+    echo "$@"
+  fi
+}
+
+main()
+{
+  echo "Main"
+  log "Log Main"
+  log_error "Error Main"
+}
+
+# Parsing arguments
+if [ $# -eq 1 ]; then
+  if [ "$1" == "-h" ]; then
     usage
     exit 0
+  elif [ "$1" == "-v" ]; then
+    log_level=1
+    log "Log Level set to verbose!"
   else
-    echo "Illegal Argument!" >&2
+    log_error "Illegal Argument!"
     usage
     exit 1
   fi
-else
-  echo "Illegal Arguments!" >&2
+elif [ $# -ge 2 ]; then
+  log_error "At most one argument is permitted!" 
   usage
   exit 1
 fi
+
+# Go to main method
+main
 
