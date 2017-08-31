@@ -17,7 +17,13 @@ start_signal_command="chromium-browser --app-id=$signal_ext_id"
 if [ $# -eq 0 ]; then
   # start with nohup and pipe stdout and stderr to /dev/null
   nohup $start_signal_command >/dev/null 2>&1
-  exit 0
+  if [ $? -eq 0 ] ; then
+    echo "Done! Signal Messenger started!"
+    exit 0
+  else
+    echo "Error! Signal Messenger could not be started!"
+    exit 1
+  fi
 elif [ $# -eq 1 ]; then
   if [ "$1" == "-f" ]; then
     $start_signal_command
