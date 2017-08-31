@@ -1,0 +1,74 @@
+#!/bin/bash
+
+usage() {
+  echo "This script uses xinput to togge the touch pad on / off"
+  echo "Requires 'xinput' to be installed"
+  echo "This script cannot be executed with more than one option!"
+  echo "Usage: $0 [-h] [-v]"
+  echo "  -h      Display this message"
+  echo "  -v      Activate verbose mode" 
+}
+
+log_error() {
+  echo -e "Error: $@" >&2
+}
+
+log_warning() {
+  echo -e "Warning: $@"
+}
+
+log() {
+  if [[ $log_level -eq 1 ]]; then
+    echo -e "$@"
+  fi
+}
+ 
+main() {
+  echo -n "Checking if 'xinput' is installed... "
+  type xinput >/dev/null 2>&1 || { log_error "\nDid not find xinput!  Aborting..."; exit 1; }
+  echo "Found it!"
+  # get touchpad line from xinput list
+  xinput_touch=$(xinput | grep -i touchpad)
+  if [ -z "$xinput_touch" ]; then log_error "No touchpad found! Aborting..."; exit 1; fi
+  
+  # Get touchpad id TODO grep nicer
+  t_id=$(echo $xinput_touch | grep -Eoi 'TouchPad\s*id\=[[:digit:]]{1,2}' | grep -Eo '[[:digit:]]{1,2}')
+  log "Found touchpad with id=$t_id"
+  
+  # Check current state
+  state=$(xinput list-props $t_id | grep "Device Enabled" | grep -o "[01]$")
+  log "Touchpad with id=$t_id is currently $([ $state == 1 ] && echo "on" || echo "off")"
+  if [ $state -eq 0 ]; then
+    log "Enabling touchpad with id=$t_id..."
+    xinput --enable $t_id
+  else
+    log "Disabling touchpad with id=$t_id..."
+    xinput --disable $t_id
+  fi
+  if [ $? -ne 0 ]; then log_error "Toggling touchpad off/on failed! Aborting..."; exit 1; fi
+  state=$(xinput list-props $t_id | grep "Device Enabled" | grep -o "[01]$")
+  echo "Done! Touchpad with id=$t_id is now $([ $state == 1 ] && echo "on" || echo "off")!"
+  exit 0
+}
+
+# Parsing arguments
+if [ $# -eq 1 ]; then
+  if [ "$1" == "-h" ]; then
+    usage
+    exit 0
+  elif [ "$1" == "-v" ]; then
+    log_level=1
+    log "Log level set to verbose!\n"
+  else
+    log_error "Illegal Argument!\n"
+    usage
+    exit 1
+  fi
+elif [ $# -ge 2 ]; then
+  log_error "Only one option permitted!\n" 
+  usage
+  exit 1
+fi
+
+# Go to main method
+main
