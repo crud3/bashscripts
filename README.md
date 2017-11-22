@@ -21,9 +21,6 @@ This script is very simple and does not cope very well with weird file names or 
 
 If it ever comes to a situation where I knowingly and willingly created file names or paths with whitespaces in them, I would need to sit down and rethink my life anyways.
 
-## <code><a name="signal-messenger">signal-messenger</a></code> script
-Script to start "Signal Private Messenger" Chrome extension via command line without attaching it to the terminal.
-
 <code>signal-messenger -h</code> will print usage information
 
 ## <code><a name="togtouch">togtouch</a></code> script

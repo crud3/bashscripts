@@ -13,7 +13,7 @@ bin_dir=$HOME/bin
 scripts_dir=$HOME/bashscripts/scripts
 
 # scripts that are to be installed
-script_list=(signal-messenger bashscript_template doesNotExistJustForTesting)
+script_list=(bashscript_template doesNotExistJustForTesting)
 
 usage() {
   echo "This script makes the specified bash scripts in ./scripts executable"
