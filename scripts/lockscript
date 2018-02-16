@@ -1,0 +1,79 @@
+#!/bin/bash
+
+# Log level (0 standard, 1 verbose)
+log_level=0
+
+usage() {
+  echo "Locking the screen with i3lock in more or less funny ways."
+  echo "Default is the standard i3lock."
+  echo "Usage: $0 [-h] [-n] [-w] [-c]"
+  echo "  -h      Display this message"
+  echo "  -n      Lock the screen with a pixelated screenshot"
+  echo "  -w      Windows tiles"
+  echo "  -c      Windows crash" 
+}
+
+log_error() {
+  echo "$@" >&2
+}
+
+log() {
+  if [[ $log_level -eq 1 ]]; then
+    echo "$@"
+  fi
+}
+
+main()
+{
+  log "Log Main"
+  i3lock
+}
+
+lock_pixelated()
+{
+  scrot /tmp/lockscreenshot.png
+  convert /tmp/lockscreenshot.png -scale 10% -scale 1000% /tmp/lockscreenshot.png
+  [[ -f $1 ]] && convert /tmp/lockscreenshot.png $1 \
+    -gravity center -composite -matte /tmp/lockscreenshot.png
+  i3lock -e -f -i /tmp/lockscreenshot.png
+  rm /tmp/lockscreenshot.png
+}
+
+lock_windows()
+{
+  i3lock -p win -e -u -i $HOME/lockscreen/win.png
+}
+
+lock_crash()
+{
+  i3lock -e -u -i $HOME/lockscreen/crash.png
+}
+
+# Parsing arguments
+if [ $# -eq 1 ]; then
+  if [ "$1" == "-h" ]; then
+    usage
+    exit 0
+  elif [ "$1" == "-n" ]; then
+    log "Normal locking"
+    lock_pixelated
+  elif [ "$1" == "-w" ]; then
+    log "Windows lockscreen"
+    lock_windows
+  elif [ "$1" == "-c" ]; then
+    log "Crash lockscreen"
+    lock_crash    
+  else
+    log_error "Illegal Argument!"
+    usage
+    exit 1
+  fi
+elif [ $# -ge 2 ]; then
+  log_error "At most one argument is permitted!" 
+  usage
+  exit 1
+fi
+
+# Go to main method
+main
+
