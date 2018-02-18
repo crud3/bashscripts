@@ -1,0 +1,6 @@
+#!/bin/bash
+files=($HOME/Dropbox/nixres/wallpaper/*)
+# Chose random file without filter
+rpick=$(printf "%s\n" "${files[RANDOM % ${#files[@]}]}")
+# Set it as background
+feh --bg-center $rpick
