@@ -41,12 +41,12 @@ lock_pixelated()
 
 lock_windows()
 {
-  i3lock -p win -e -u -i $HOME/lockscreen/win.png
+  i3lock -p win -e -u -i $HOME/Dropbox/nixres/lockscreen/win.png
 }
 
 lock_crash()
 {
-  i3lock -e -u -i $HOME/lockscreen/crash.png
+  i3lock -e -u -i $HOME/Dropbox/nixres/lockscreen/crash.png
 }
 
 # Parsing arguments
@@ -76,4 +76,3 @@ fi
 
 # Go to main method
 main
-
