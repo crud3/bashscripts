@@ -13,7 +13,7 @@ bin_dir=$HOME/bin
 scripts_dir=$HOME/bashscripts/scripts
 
 # scripts that are to be installed
-script_list=(bashscript_template togtouch configureXrandr)
+readarray script_array < index
 
 usage() {
   echo "This script makes the specified bash scripts in ./scripts executable"
@@ -41,8 +41,7 @@ log() {
 }
 
 # Checks if the ~/bin dir exists and is in $PATH
-check_bin_dir()
-{
+check_bin_dir() {
   if [ -d $bin_dir ]; then
     log "$bin_dir exsists"
     if [[ :$PATH: == *:"$bin_dir":* ]]; then
@@ -55,7 +54,6 @@ check_bin_dir()
     exit 1
   fi							    
 }
-
 
 write_symlink() {
   log "Trying to write symlink to $(readlink -f $scripts_dir/$1) at $bin_dir"
@@ -89,15 +87,14 @@ main() {
 
   check_bin_dir
 
-  for script in ${script_list[@]}
+  for script in ${script_array[@]}
   do
     log "\nProcessing script $script"
     # Check if script exists in the scripts/ dir
     if [[ -f $scripts_dir/$script ]]; then
       log "Found script $script in $scripts_dir, making it executable!"
-      chmod +x $scripts_dir/$script
+      chmod u+x $scripts_dir/$script
       write_symlink $script
-
     else
       log_warning "Script $script does not exist!\n"
     fi
