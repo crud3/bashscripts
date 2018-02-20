@@ -1,6 +1,0 @@
-#!/bin/bash
-scrot /tmp/lockscreenshot.png
-convert /tmp/lockscreenshot.png -scale 10% -scale 1000% /tmp/lockscreenshot.png
-[[ -f $1 ]] && convert /tmp/lockscreenshot.png $1 -gravity center -composite -matte /tmp/lockscreenshot.png
-i3lock -e -f -i /tmp/lockscreenshot.png
-rm /tmp/lockscreenshot.png
