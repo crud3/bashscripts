@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# Log level (0 standard, 1 verbose)
+log_level=0
+step_size=10
+min_brightness=10
+
+usage() {
+  echo "Increase or decrease brightness of the screen"
+  echo "This script needs xbacklight installed and xorg.conf configured!"
+  echo "Usage: $0 [-h] [-i] [-d]"
+  echo "  -h      Print this message"  
+  echo "  -i      Increase brightness by $step_size"
+  echo "  -d      Decrease brightness by $step_size"
+}
+
+log_error() {
+  echo "$@" >&2
+}
+
+log() {
+  if [[ $log_level -eq 1 ]]; then
+    echo "$@"
+  fi
+}
+
+increase_brightness() {
+  log Current brightness: $current_brightness
+  log Increasing brightness by $step_size
+  xbacklight -inc $step_size
+  log Brightness is now at $(xbacklight -get)
+}
+
+decrease_brightness() {
+  current_brightness=$(xbacklight -get)
+  log Current brightness: $current_brightness
+  desired=$(echo "$current_brightness - $step_size" | bc)
+  log Desired Brightness: $desired
+  log Min Brightness: $min_brightness
+  if (( $(echo "$desired > $min_brightness" | bc -l) )); then
+    log Decreasing brightness by $step_size to $desired
+    xbacklight -set $desired
+  else
+    log Decreasing by $step_size would fall below minimum brightness
+    log Setting to minimum brightness instead
+    xbacklight -set $min_brightness
+  fi
+}
+
+# Parsing arguments
+if [ $# -eq 1 ]; then
+  if [ "$1" == "-h" ]; then
+    usage
+    exit 0
+  elif [ "$1" == "-i" ]; then
+    increase_brightness
+  elif [ "$1" == "-d" ]; then
+    decrease_brightness
+  else
+    log_error "Illegal Argument!"
+    usage
+    exit 1
+  fi
+elif [ $# -ge 2 ] || [ $# -lt 1 ]; then
+  log_error "Script needs exactly ONE argument!" 
+  usage
+  exit 1
+fi
