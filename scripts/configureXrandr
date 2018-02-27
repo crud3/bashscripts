@@ -1,19 +1,44 @@
 #!/bin/bash
-# script to configure my monitors, called from i3wm
+
 xrandr_output=$(xrandr)
+
+###################### DESKTOP ###################### 
+
 # Only desktop has DVI
 if [[ $xrandr_output == *"DVI-D-0 connected"* ]]
 then
-        xrandr --output DVI-D-0 --primary --mode 1920x1080 --pos 1920x0 --rotate normal \
-               --output HDMI-0 --mode 1920x1080 --pos 0x0 --rotate normal \
-               --output DP-5 --off \
-               --output DP-4 --off \
-               --output DP-3 --off \
-               --output DP-2 --off \
-               --output DP-1 --off \
-               --output DP-0 --off
-#elif... case Laptop
-# For now just assuming Laptop without external monitor
-# TODO configure for 2nd monitor on HDMI if there is one
+    xrandr --output DVI-D-0 --primary --mode 1920x1080 --pos 1920x0 --rotate normal \
+           --output HDMI-0 --mode 1920x1080 --pos 0x0 --rotate normal \
+           --output DP-5 --off \
+           --output DP-4 --off \
+           --output DP-3 --off \
+           --output DP-2 --off \
+           --output DP-1 --off \
+           --output DP-0 --off
+
+###################### LAPTOP ###################### 
+
+# If laptop has a second monitor connected via HDMI
+elif [[ $xrandr_output == *"eDP1 connected"* ]] \
+        && [[ $xrandr_output == *"HDMI2 connected"* ]] \
+        && [[ $xrandr_output == *"DP1 disconnected"* ]]
+then
+    xrandr --output HDMI2 --mode 1920x1080 --pos 0x0 --rotate normal \
+           --output HDMI1 --off \
+           --output DP1 --off \
+           --output eDP1 --primary --mode 1920x1080 --pos 1920x0 --rotate normal \
+           --output VIRTUAL1 --off
+
+# Laptop without any external monitors
+elif [[ $xrandr_output == *"eDP1 connected"* ]] \
+        && [[ $xrandr_output == *"HDMI1 disconnected"* ]] \
+        && [[ $xrandr_output == *"HDMI2 disconnected"* ]] \
+        && [[ $xrandr_output == *"DP1 disconnected"* ]]
+then
+    xrandr --output HDMI2 --off \
+           --output HDMI1 --off \
+           --output DP1 --off \
+           --output eDP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal \
+           --output VIRTUAL1 --off
 fi
 
