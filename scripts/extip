@@ -1,0 +1,11 @@
+#!/bin/bash
+# Uses dyn check ip tool
+# see https://help.dyn.com/remote-access-api/checkip-tool/
+# If there are more than 100 bytes in the response, it's probably not a valid response
+
+content=$(curl -s http://checkip.dynds.org/)
+if [ $(echo $content | wc -c)  -gt 100 ]; then
+        echo "ERROR"
+else
+        echo $(echo $content | grep -o '[0-9][0-9]*.[0-9][0-9]*.[0-9][0-9]*.[0-9]*')
+fi

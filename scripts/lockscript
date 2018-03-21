@@ -1,7 +1,13 @@
 #!/bin/bash
+# Requires:
+# * i3lock
+# * scrot
+# * convert
 
 # Log level (0 standard, 1 verbose)
 log_level=0
+# i3lock will beep trying to grab the keyboard repeatedly
+setterm -blength 0
 
 usage() {
   echo "Locking the screen with i3lock in more or less funny ways."
@@ -9,6 +15,7 @@ usage() {
   echo "Usage: $0 [-h] [-n] [-w] [-c]"
   echo "  -h      Display this message"
   echo "  -n      Lock the screen with a pixelated screenshot"
+  echo "  -t      Lock the screen with a clear screenshot"
   echo "  -w      Windows tiles"
   echo "  -c      Windows crash" 
 }
@@ -25,7 +32,7 @@ log() {
 
 main()
 {
-  log "Log Main"
+  log "Standard i3lock"
   i3lock
 }
 
@@ -35,6 +42,13 @@ lock_pixelated()
   convert /tmp/lockscreenshot.png -scale 10% -scale 1000% /tmp/lockscreenshot.png
   [[ -f $1 ]] && convert /tmp/lockscreenshot.png $1 \
     -gravity center -composite -matte /tmp/lockscreenshot.png
+  i3lock -e -f -i /tmp/lockscreenshot.png
+  rm /tmp/lockscreenshot.png
+}
+
+lock_transparent()
+{
+  scrot /tmp/lockscreenshot.png
   i3lock -e -f -i /tmp/lockscreenshot.png
   rm /tmp/lockscreenshot.png
 }
@@ -55,8 +69,11 @@ if [ $# -eq 1 ]; then
     usage
     exit 0
   elif [ "$1" == "-n" ]; then
-    log "Normal locking"
+    log "Pixelated locking"
     lock_pixelated
+  elif [ "$1" == "-t" ]; then
+    log "Transparent locking"
+    lock_transparent
   elif [ "$1" == "-w" ]; then
     log "Windows lockscreen"
     lock_windows
