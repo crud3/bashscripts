@@ -1,0 +1,3 @@
+#!/bin/bash
+
+geth --datadir=$HOME/.rinkeby --rinkeby --syncmode="fast" --cache=2048 -rpc --rpcapi="personal,eth,net,network"
